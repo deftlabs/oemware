@@ -1,0 +1,68 @@
+
+    <!--
+    (C) Copyright 2007, Deft Labs.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published 
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+     
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+     
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    -->
+
+    <!-- ******************************************************************* -->
+    <!-- Generate the jaxb files.                                            -->
+    <!-- ******************************************************************* -->
+
+    <target name="generate.jaxb">
+        <mkdir dir="${dir.src.java.generate}/${jaxb.package.path}"/>
+        <exec executable="xjc">
+            <arg value="conf/xsd/${jaxb.xsd.file}"/>
+            <arg value="-readOnly"/>
+            <arg value="-p"/>
+            <arg value="${jaxb.package.name}"/>
+            <arg value="-d"/>
+            <arg value="${dir.src.java.generate}"/>
+        </exec>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Generate the junit jaxb files.                                      -->
+    <!-- ******************************************************************* -->
+
+    <target name="generate.jaxb.unit">
+        <mkdir dir="${dir.src.java.generate}/${jaxb.package.path}"/>
+        <exec executable="xjc">
+            <arg value="conf/xsd/${jaxb.xsd.file}"/>
+            <arg value="-readOnly"/>
+            <arg value="-p"/>
+            <arg value="${jaxb.package.name}"/>
+            <arg value="-d"/>
+            <arg value="${dir.src.java.generate}"/>
+        </exec>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Generate the specific jaxb files.                                   -->
+    <!-- ******************************************************************* -->
+
+    <!-- Please make sure you Keep this list up to date or things will break. -->
+    <target name="generate.jaxb.all">
+        <antcall target="generate.jaxb.apictrl-config"/>
+    </target>
+
+    <target name="generate.jaxb.apictrl-config">
+        <antcall target="generate.jaxb">
+        <param name="jaxb.xsd.file" value="apictrl-config.xsd"/>
+        <param name="jaxb.package.name" value="oemware.core.apictrl.config"/>
+        <param name="jaxb.package.path" value="oemware/core/apictrl/config"/>
+        </antcall>
+    </target>
+
+

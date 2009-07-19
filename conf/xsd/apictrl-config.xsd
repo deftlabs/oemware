@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+(C) Copyright 2009, Deft Labs.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published 
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!-- If you modify this document you must regenerate the jaxb objects. -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"> 
+
+    <xsd:annotation><xsd:appinfo><jaxb:property generateIsSetMethod="true"/></xsd:appinfo></xsd:annotation>
+    
+    <xsd:element name="controllers" type="controllersDef"/>
+    
+    <xsd:complexType name="controllersDef">
+        
+        <xsd:sequence><xsd:element ref="controller" minOccurs="0" maxOccurs="unbounded"/></xsd:sequence>
+
+    </xsd:complexType>
+
+    <xsd:element name="controller" type="controllerDef"/>
+
+    <xsd:complexType name="controllerDef">
+
+        <xsd:sequence>
+            <xsd:element ref="constructor-arg" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="action" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+ 
+        <xsd:attribute name="path" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="constructor-arg" type="constructorArgDef"/>
+    <xsd:element name="action" type="actionDef"/>
+    
+    <xsd:complexType name="constructorArgDef">
+        <xsd:attribute name="componentId" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="actionDef">
+        <xsd:attribute name="name" type="xsd:string" use="required"/> 
+    </xsd:complexType>
+
+</xsd:schema> 
+

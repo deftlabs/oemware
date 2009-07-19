@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+(C) Copyright 2007, Deft Labs.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published 
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Version: $Id$
+-->
+
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd 
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <aop:aspectj-autoproxy/>
+
+    <bean id="springLifecycleDiagnostic" init-method="startup" destroy-method="shutdown" class="oemware.core.chain.SpringLifecycleDiagnostic"/>
+
+    <bean id="nodeConf" class="oemware.core.InstanceConf">
+        <constructor-arg value="oemware.node"/>
+        <property name="jobName" value="nodeConfSharedJob"/>
+    </bean>
+
+    <bean id="moduleConf" class="oemware.core.InstanceConf">
+        <constructor-arg value="oemware.module"/>
+        <property name="jobName" value="moduleConfSharedJob"/>
+    </bean>
+
+    <bean id="instanceConf" class="oemware.core.InstanceConf">
+        <constructor-arg value="oemware.instance"/>
+        <property name="jobName" value="instanceConfSharedJob"/>
+    </bean>
+
+    <bean id="serviceConf" class="oemware.core.ServiceConf">
+        <constructor-arg ref="nodeConf"/>
+        <constructor-arg ref="moduleConf"/>
+        <constructor-arg ref="instanceConf"/>
+    </bean>
+
+    <util:list id="baseSharedJobs" list-class="java.util.LinkedList">
+        <ref local="instanceConf"/>
+        <ref local="moduleConf"/>
+        <ref local="nodeConf"/>
+    </util:list>
+
+    <bean id="baseShardJobRunner" class="oemware.core.SharedJobRunner" init-method="startup" destroy-method="shutdown">
+        <property name="joinThread" value="true"/>
+        <property name="joinTimeout" value="500"/>
+        <property name="sleepTime" value="1000"/>
+        <property name="maxTimeBeforeError" value="1000"/>
+        <property name="name" value="oemware-core-shared-job-runner-base"/>
+        <property name="daemon" value="false"/>
+        <property name="priority"><util:constant static-field="java.lang.Thread.NORM_PRIORITY"/></property>
+        <property name="jobs" ref="baseSharedJobs"/>
+    </bean>
+
+    <bean id="commonUdpServer" class="oemware.core.net.DatagramServer" init-method="startup" destroy-method="shutdown">
+        <constructor-arg ref="commonUdpMessageHandler"/>
+        <constructor-arg ref="serviceConf"/>
+        <constructor-arg><util:constant static-field="oemware.core.net.Constants.COMMON_UDP_BUFFER_SIZE"/></constructor-arg>
+        <constructor-arg value="0"/>
+        <constructor-arg><util:constant static-field="oemware.core.net.Constants.COMMON_UDP_BIND_ADDRESS_PARAM_NAME"/></constructor-arg>
+        <constructor-arg><util:constant static-field="oemware.core.net.Constants.COMMON_UDP_PORT_PARAM_NAME"/></constructor-arg>
+        <constructor-arg value="false"/>
+        <property name="joinThread" value="true"/>
+        <property name="joinTimeout" value="500"/>
+        <property name="name" value="oemware-common-udp-server"/>
+        <property name="daemon" value="false"/>
+        <property name="priority"><util:constant static-field="java.lang.Thread.NORM_PRIORITY"/></property>
+    </bean>
+
+    <util:map id="commonUdpMessageHandlers" map-class="java.util.HashMap">
+        <entry>
+            <key><util:constant static-field="oemware.core.net.CoreMessageId.SHUTDOWN"/></key>
+            <ref local="shutdownMessageHandler"/>
+        </entry>
+    </util:map>
+
+    <bean id="commonUdpMessageHandler" class="oemware.core.net.SharedUdpMessageHandler">
+        <property name="handlers" ref="commonUdpMessageHandlers"/>
+    </bean>
+
+    <bean id="shutdownMessageHandler" class="oemware.core.net.ShutdownMessageHandler"/>
+ 
+</beans>

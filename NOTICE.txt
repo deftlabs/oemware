@@ -1,0 +1,61 @@
+#
+# (C) Copyright 2007, Deft Labs.
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published 
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# version: $Id: NOTICE.txt 12 2008-06-15 19:37:58Z oemware $
+#
+
+----------------------------------------
+
+If you choose to embed OEMware in another product, please use:
+
+This product includes software developed by OEMware (http://oemware.com).
+
+----------------------------------------
+
+The OEMware list of included products:
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+Apache Commons Logging
+Copyright 2003-2008 The Apache Software Foundation
+
+Apache Commons Chain
+Copyright 2003-2008 The Apache Software Foundation
+  
+Apache Commons Lang
+Copyright 2001-2008 The Apache Software Foundation
+
+Apache Commons Pool
+Copyright 2008 The Apache Software Foundation
+
+Apache log4j
+Copyright 2008 The Apache Software Foundation
+
+Apache Tomcat
+Copyright 1999-2007 The Apache Software Foundation
+
+This product includes software developed by the Spring Framework
+Project (http://www.springframework.org).
+
+This product includes software developed by Sun Microsystems, Inc. 
+(http://openjdk.java.net/).
+
+Java compilation software for JSP pages is provided by Eclipse,
+which is an open source software.  The orginal software and
+related infomation is available at http://www.eclipse.org.
+
+----------------------------------------

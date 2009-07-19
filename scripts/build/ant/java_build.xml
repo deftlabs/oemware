@@ -1,0 +1,50 @@
+
+    <!-- 
+    (C) Copyright 2007, Deft Labs.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published 
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    Version: $Id$
+    -->
+
+    <!-- ******************************************************************* -->
+    <!-- Compile the specfic java classes.                                   -->
+    <!-- ******************************************************************* -->
+
+    <target name="compile.java"> 
+
+        <antcall target="compile.java.classes">
+            <param name="dir.compile.java.src.1" value="${dir.src.java}"/>
+            <param name="dir.compile.java.src.2" value="${dir.src.java.unit}"/>
+            <param name="dir.compile.java.src.3" value="${dir.src.java.generate}"/>
+        </antcall>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Compile the java classes.                                           -->
+    <!-- ******************************************************************* -->
+
+    <target name="compile.java.classes">
+        <mkdir dir="${dir.java.build}"/>
+        <mkdir dir="${dir.build}/modules/lib/java"/>
+        <javac destdir="${dir.java.build}" target="${javac.source}" debug="true" encoding="UTF-8" classpathref="classpath.cp" source="${javac.source}" debuglevel="lines,vars,source">
+            <src path="${dir.compile.java.src.1}"/>
+            <src path="${dir.compile.java.src.2}"/>
+            <src path="${dir.compile.java.src.3}"/>
+            <compilerarg value="-Xlint:all,-fallthrough"/>
+            <classpath refid="classpath.all"/> 
+        </javac>
+    </target>
+
+    <!-- ******************************************************************* -->

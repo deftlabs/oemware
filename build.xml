@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!--
+(C) Copyright 2007, Deft Labs.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published 
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
+-->
+
+<!DOCTYPE project [ 
+    <!ENTITY db SYSTEM "./scripts/build/ant/db.xml"> 
+    <!ENTITY java-build SYSTEM "./scripts/build/ant/java_build.xml"> 
+    <!ENTITY java-package SYSTEM "./scripts/build/ant/java_package.xml">
+    <!ENTITY java-module SYSTEM "./scripts/build/ant/java_module.xml">
+    <!ENTITY java-unit SYSTEM "./scripts/build/ant/java_unit.xml">
+    <!ENTITY java-jaxb SYSTEM "./scripts/build/ant/java_jaxb.xml">
+]>
+
+<project name="oemware" default="usage" basedir="./" xmlns:aspectj="antlib:org.aspectj">
+
+    <!-- ******************************************************************* -->
+    <!-- Set the base attributes.                                            -->
+    <!-- ******************************************************************* -->
+
+    <property file="conf/build/build.properties"/>
+    <tstamp><format property="current-time" pattern="yyyy-MM-dd HH:mm z"/></tstamp>
+    <property name="dir.src.java" value="src/java"/>
+    <property name="dir.src.java.generate" value="build/src/java"/>
+    <property name="dir.src.java.unit" value="src/unit_java"/>
+    <property name="dir.java.build" value="${dir.build}/java/classes"/>
+    <property name="javac.source" value="1.6"/>
+    <property name="dir.java.lib.common" value="lib/java/"/>
+    <property name="dir.dist" value="dist"/>
+    <property name="dir.docs" value="docs"/>
+    <path id="classpath.all"><fileset dir="${dir.java.lib.common}"><include name="*.jar"/></fileset></path>
+    <path id="classpath.cp"><pathelement location="${dir.java.build}"/></path>
+
+    <!-- ******************************************************************* -->
+    <!-- The includes.                                                       -->
+    <!-- ******************************************************************* -->
+
+    &java-build;
+    &java-package;
+    &java-module;
+    &java-unit;
+    &java-jaxb;
+
+    <!-- ******************************************************************* -->
+    <!-- Package the jar file.                                               -->
+    <!-- ******************************************************************* -->
+
+    <target name="package.jar" depends="compile.java"> 
+        <mkdir dir="${dir.dist}"/>
+        <jar destfile="${dir.dist}/oemware.jar" basedir="${dir.java.build}"/>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Init the dev environment.                                           -->
+    <!-- ******************************************************************* -->
+
+    <target name="init">
+        <mkdir dir="${dir.src.java.generate}"/>
+        <antcall target="generate.jaxb.all"/>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Package the entire release.                                         -->
+    <!-- ******************************************************************* -->
+
+    <target name="package" depends="package.jar,javadoc"> 
+        <mkdir dir="${dir.dist}/release/oemware"/>
+        <mkdir dir="${dir.dist}/release/oemware/docs/api"/>
+        <mkdir dir="${dir.dist}/release/oemware/scripts/service/module"/>
+        <copy file="${dir.dist}/oemware.jar" tofile="${dir.dist}/release/oemware/oemware.jar"/>
+        <copy todir="${dir.dist}/release/oemware/docs/api"><fileset dir="${dir.docs}/api"/></copy>
+        <copy todir="${dir.dist}/release/oemware/scripts/service/module"><fileset dir="scripts/service/module"/></copy>
+        <zip destfile="${dir.dist}/oemware-${release.version}.zip" basedir="${dir.dist}/release"/>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Generate the Javadocs.                                              -->
+    <!-- ******************************************************************* -->
+
+    <target name="javadoc"> 
+        <mkdir dir="${dir.docs}/api"/>
+        <javadoc    packagenames="oemware.core.*" 
+                    sourcepath="src/java"
+                    defaultexcludes="yes"
+                    destdir="${dir.docs}/api"
+                    author="false"
+                    version="true"
+                    use="true"
+                    windowtitle="OEMware API"
+                    stylesheetfile="conf/build/stylesheet.css">
+            <doctitle><![CDATA[<a href="http://oemware.com"><img src="http://oemware.com/img/oemware_logo_sm.png" style="border:0;" alt="OEMware logo" /></a>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2008 <a href="http://deftlabs.com">Deft Labs</a> - Released under <a href="http://www.opensource.org/licenses/lgpl-3.0.html">LGPL, Version 3.0</a></i><script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); </script>]]></bottom>
+            <classpath refid="classpath.all"/> 
+        </javadoc>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Remove the build directory.                                         -->
+    <!-- ******************************************************************* -->
+
+    <target name="clean">
+        <delete dir="${dir.build}"/>
+        <delete dir="${dir.dist}"/>
+        <delete dir="${dir.docs}"/>
+        <antcall target="init"/>
+    </target>
+        
+    <!-- ******************************************************************* -->
+    <!-- Describe the build file usage.                                      -->
+    <!-- ******************************************************************* -->
+
+    <target name="usage">
+<echo>
+----------------------------------------
+
+- Compile the Java files ......................... compile.java
+
+- Package jar file ............................... package.jar
+
+- Package the dev module ......................... package.devmodule
+
+- Package the release ............................ package
+
+- Create Javadocs ................................ javadoc
+
+- Run unit tests ................................. unit
+
+- Clean the build and package dirs ............... clean
+
+----------------------------------------
+</echo>
+    </target>
+
+    <!-- ******************************************************************* -->
+
+</project>
