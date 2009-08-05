@@ -69,6 +69,19 @@ public final class FileUtilsTests {
     }
 
     @Test
+    public void testExtractDir() throws Exception {
+        final String file1 = "/one/two/three/test.txt";
+        assertEquals("/one/two/three", FileUtils.extractDir(file1));
+    }
+
+    @Test
+    public void testGetFileParent() throws Exception {
+        final String path = "/one/two/three";
+        final String file = path + "/test.txt";
+        assertEquals(path, FileUtils.getFileParent(file)); 
+    }
+
+    @Test
     public final void testGetFileNamesRecursive() throws Exception {
         final File scratchDir = new File(SCRATCH_DIR);
         deleteDir(scratchDir);
