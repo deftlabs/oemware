@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
@@ -40,8 +41,10 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Date;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.InvalidPropertiesFormatException;
+import java.util.UUID;
 
 /**
  * The file utils.
@@ -52,6 +55,14 @@ import java.util.InvalidPropertiesFormatException;
 public final class FileUtils {
 
     public static final int DEFAULT_MAX_FILE_NAMES = 10000;
+
+    private static final char SLASH = '/';
+    private static final char DASH = '-';
+    private static final char PERIOD = '.';
+
+    private static final String DASH_STR = "-";
+    private static final String EMPTY_STR = "";
+    private static final String PERIOD_STR = ".";
 
     /**
      * Writes the entire input stream to the file. This class creates a 1024 
@@ -66,6 +77,23 @@ public final class FileUtils {
     {
         final byte [] buffer = new byte[1024];
         writeInputStreamToFile(pInputStream, pFileName, buffer);
+    }
+
+    /**
+     * Returns the file file path.
+     * @param pFile The file.
+     * @return The file path.
+     */
+    public static String getFileParent(final String pFile) 
+    { return getFileParent(new File(pFile)); }
+
+    /**
+     * Returns the file file path.
+     * @param pFile The file.
+     * @return The file path.
+     */
+    public static String getFileParent(final File pFile) { 
+        return pFile.getParent();
     }
 
     /**
@@ -123,6 +151,29 @@ public final class FileUtils {
         return writeInputStreamToFile(  pInputStream, 
                                         pFileName, 
                                         new byte[pReadBufferSize]);
+    }
+
+    /**
+     * Writes the string to to a file.
+     * @param pContent The content.
+     * @param pFileName The file name.
+     * @throws FileException
+     */
+    public static final void writeStrToFile(final String pContent, 
+                                            final String pFileName)
+        throws FileException
+    {
+        FileWriter writer = null;
+        try {
+            final File file = createFile(pFileName);
+            writer = new FileWriter(file);
+            writer.write(pContent);
+
+        } catch (IOException ioe) { throw new FileException(ioe);
+        } finally { 
+            try { if (writer != null) writer.close(); 
+            } catch (IOException ioe) { throw new FileException(ioe); }
+        }
     }
 
     /**
@@ -289,7 +340,7 @@ public final class FileUtils {
     /**
      * Returns files from the data dir based on the max allowed.
      * @param pDataDir The data directory.
-     * @param pExclude Set to true to get all the files but this fileter.
+     * @param pExclude Set to true to get all the files but this filter.
      * @param pEndsWith Set to true to indicate that the filter be the end 
      * value.
      * @return The files names.
@@ -303,7 +354,7 @@ public final class FileUtils {
     /**
      * Returns files from the data dir based on the max allowed.
      * @param pDataDir The data directory.
-     * @param pExclude Set to true to get all the files but this fileter.
+     * @param pExclude Set to true to get all the files but this filter.
      * @param pEndsWith Set to true to indicate that the filter be the end 
      * value.
      * @param pRecursive Set to true to walk the directories below. Uses the
@@ -327,7 +378,7 @@ public final class FileUtils {
     /**
      * Returns files from the data dir based on the max allowed.
      * @param pDataDir The data directory.
-     * @param pExclude Set to true to get all the files but this fileter.
+     * @param pExclude Set to true to get all the files but this filter.
      * @param pEndsWith Set to true to indicate that the filter be the end 
      * value.
      * @param pRecursive Set to true to walk the directoeis below.
@@ -422,6 +473,8 @@ public final class FileUtils {
         return streams;
     }
 
+
+
     /**
      * Close the input streams.
      * @param pInputStreams The input streams.
@@ -441,6 +494,19 @@ public final class FileUtils {
      * @throws CoreException 
      */
     public static final void closeFileInputStream(final FileInputStream pInputStream)
+        throws CoreException 
+    {
+        if (pInputStream == null) return;
+        try { pInputStream.close();
+        } catch (IOException ioe) { throw new CoreException(ioe); }
+    }
+
+    /**
+     * Close the input stream.
+     * @param pInputStream The input stream.
+     * @throws CoreException 
+     */
+    public static final void closeInputStream(final InputStream pInputStream)
         throws CoreException 
     {
         if (pInputStream == null) return;
@@ -712,6 +778,14 @@ public final class FileUtils {
         throws FileException
     { return (pFilePath + UUID.randomUUID().toString()); }
 
+    /**
+     * Extract the directory from the absolute file name.
+     * @param pFileName The file name.
+     * @return The directory <b>without</b> the trailing slash /.
+     */
+    public static String extractDir(final String pFileName) {
+        return pFileName.substring(0, pFileName.lastIndexOf(SLASH));
+    }
 
     /**
      * Create a new file. If the file exisits, an exception is thrown.
@@ -723,9 +797,7 @@ public final class FileUtils {
         throws FileException
     {
         // Create the parent directory.
-
-        createDir(  pFileName.substring(0, 
-                    pFileName.lastIndexOf(File.separatorChar))); 
+        createDir(extractDir(pFileName));
 
         final File file = new File(pFileName);
         
@@ -810,6 +882,37 @@ public final class FileUtils {
                                         + pTo
                                         + " - second attempt");
             }
+        }
+    }
+
+    /**
+     * Move a file.
+     * @param pFile The from file.
+     * @param pToDir The directory to file.
+     * @throws CoreException
+     */
+    public final static void moveFile(final String pFile, 
+                                      final String pToDir)
+        throws CoreException
+    { moveFile(new File(pFile), new File(pToDir)); }
+
+    /**
+     * Move a file.
+     * @param pFile The from file.
+     * @param pToDir The directory to file.
+     * @throws CoreException
+     */
+    public final static void moveFile(final File pFile, 
+                                      final File pToDir)
+        throws CoreException
+    {
+        if (!pToDir.exists()) pToDir.mkdirs();
+
+        if (!pFile.renameTo(new File(pToDir, pFile.getName()))) {
+            throw new CoreException("Unable to move file: " 
+                                    + pFile 
+                                    + " - to dir: " 
+                                    + pToDir);
         }
     }
 
@@ -1229,6 +1332,40 @@ public final class FileUtils {
     
         fileName.append(".");
         fileName.append(pExtension);
+        return fileName.toString();
+    }
+
+    /**
+     * Create a file name path with a random uuid for the name 
+     * and the current time for the path (and passed extension).
+     * @param pRootDir The base directory.
+     * @param pFileNameExt The file name extension.
+     * @return The file name/path.
+     */
+    public static String assembleTimePathUuidFile(  final String pRootDir, 
+                                                    final String pFileNameExt) 
+    {
+        final StringBuilder fileName = new StringBuilder(pRootDir);
+
+        // Get the time.
+        final Calendar now = Calendar.getInstance();
+        fileName.append(now.get(Calendar.YEAR));
+        fileName.append(SLASH);
+        fileName.append(now.get(Calendar.MONTH));
+        fileName.append(SLASH);
+        fileName.append(now.get(Calendar.DATE));
+        fileName.append(SLASH);
+        fileName.append(now.get(Calendar.HOUR_OF_DAY));
+        fileName.append(SLASH);
+        fileName.append(now.get(Calendar.MINUTE));
+        fileName.append(SLASH);
+        fileName.append(now.get(Calendar.SECOND));
+        fileName.append(SLASH);
+        final File dir = new File(fileName.toString());
+        if (!dir.exists()) dir.mkdirs();
+        fileName.append(UUID.randomUUID().toString().replace(DASH_STR, EMPTY_STR));
+        if (!pFileNameExt.startsWith(PERIOD_STR)) fileName.append(PERIOD);
+        fileName.append(pFileNameExt);
         return fileName.toString();
     }
 }
