@@ -99,12 +99,11 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
                     defaultexcludes="yes"
                     destdir="${dir.docs}/api"
                     author="false"
-                    version="true"
+                    version="false"
                     use="true"
-                    windowtitle="OEMware API"
-                    stylesheetfile="conf/build/stylesheet.css">
+                    windowtitle="OEMware API">
             <doctitle><![CDATA[<a href="http://oemware.com"><img src="http://oemware.com/img/oemware_logo_sm.png" style="border:0;" alt="OEMware logo" /></a>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright &#169; 2008 <a href="http://deftlabs.com">Deft Labs</a> - Released under <a href="http://www.opensource.org/licenses/lgpl-3.0.html">LGPL, Version 3.0</a></i><script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); </script>]]></bottom>
+            <bottom><![CDATA[<i>Copyright &#169; 2009 <a href="http://deftlabs.com">Deft Labs</a> - Released under <a href="http://www.opensource.org/licenses/lgpl-3.0.html">LGPL, Version 3.0</a></i><script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); </script>]]></bottom>
             <classpath refid="classpath.all"/> 
         </javadoc>
     </target>
