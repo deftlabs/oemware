@@ -35,7 +35,7 @@ public abstract class MultiThread implements Runnable {
     private final long mSleepTime;
     private int mThreadCount;
     private Thread[] mThreads;
-    private final String mThreadName;
+    private String mThreadName;
     private final int mThreadPriority;
     private final boolean mJoinThread;
 
@@ -62,6 +62,15 @@ public abstract class MultiThread implements Runnable {
         mJoinThread = pJoinThread;
         if (mSleepTime > 0) mThreadSleep = true;
         else mThreadSleep = false;
+    }
+
+    /**
+     * Create a new object with param(s). If you call this, you must set
+     * the thread name (setName(str)).
+     * @param pThreadCount The thread count.
+     */
+    public MultiThread(final int pThreadCount) {
+        this(0l, pThreadCount, null, Thread.NORM_PRIORITY, true);
     }
 
     /**
@@ -156,6 +165,12 @@ public abstract class MultiThread implements Runnable {
             } catch (Throwable t) { mThreadLogger.error(t.getMessage(), t); }
         }
     }
+
+    /**
+     * Set the thread name (call before startup).
+     * @param pV The thread name.
+     */
+    public void setName(final String pV) { mThreadName = pV; }
 
     /**
      * This is implemented by the extending class. It's called in the thread's
