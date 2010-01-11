@@ -134,5 +134,24 @@ public final class FileUtilsTests {
         // Cleanup.
         deleteDir(scratchDir);
     }
+
+    @Test
+    public void testExtension1() throws Exception {
+        final String file1 = "/one/two/three/test.txt";
+        assertEquals("txt", FileUtils.extension(file1));
+    }
+
+    @Test
+    public void testExtension2() throws Exception {
+        final String file1 = "/one/two/three/test";
+        assertNull(FileUtils.extension(file1));
+    }
+
+    @Test
+    public void testExtension3() throws Exception {
+        final String file1 = "/one.two/two/three/test";
+        assertNull(FileUtils.extension(file1));
+    }
+
 }
 

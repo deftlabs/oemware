@@ -27,10 +27,24 @@ package oemware.core;
  */
 public final class ServiceConf {
 
-    private final InstanceConf mNodeConf;
-    private final InstanceConf mModuleConf;
-    private final InstanceConf mInstanceConf;
-    private final ServiceManager mServiceManager;
+    private InstanceConf mNodeConf;
+    private InstanceConf mModuleConf;
+    private InstanceConf mInstanceConf;
+    private ServiceManager mServiceManager;
+    private String mDataDir;
+
+    /**
+     * Construct a new instance. This is mainly used for unit tests.
+     * @param pDataDir The data directory.
+     * @throws ServiceException
+     */
+    public ServiceConf(final String pDataDir) throws ServiceException {
+        mNodeConf = new InstanceConf();
+        mModuleConf = new InstanceConf();
+        mInstanceConf = new InstanceConf();
+        mDataDir = pDataDir;
+        //mServiceManager = ServiceManager.getInstance();
+    }
 
     /**
      * Construct a new instance. 
@@ -67,6 +81,27 @@ public final class ServiceConf {
             try { return mModuleConf.getProperty(pName);
             } catch (ServiceException nse) {
                 return mNodeConf.getProperty(pName);
+            }
+        }
+    }
+
+    /**
+     * Returns the data directory property. This prepends getDataDir() to
+     * the value so make sure your value ends with a slash /.
+     * @param pName The property name (required).
+     * @param pDefault Is returned if not found in config files.
+     * @return The value. An exception is thrown if not available.
+     * @throws ServiceException
+     */
+    public final String getDataDirProperty(final String pName, final String pDefault) 
+        throws ServiceException 
+    {
+        try { return (getDataDir() + mInstanceConf.getProperty(pName));
+        } catch (ServiceException ise) { 
+            try { return (getDataDir() + mModuleConf.getProperty(pName)); 
+            } catch (ServiceException nse) {
+                try { return (getDataDir() + mNodeConf.getProperty(pName));
+                } catch (ServiceException ngse) { return getDataDir() + pDefault; }
             }
         }
     }
@@ -189,13 +224,27 @@ public final class ServiceConf {
         }
     }
 
+    /**
+     * Set the property. Adds th property to the instance conf. This
+     * will override any existing property. This is mainly used for
+     * unit tests.
+     * @param pName The property name.
+     * @param pValue The property value.
+     */
+    public final void setProperty(final String pName, final String pValue) 
+        throws ServiceException
+    { mInstanceConf.setProperty(pName, pValue);  }
+
     public final String getServiceName() {
         return mServiceManager.getServiceName();
     }
     public final String getEnvName() { return mServiceManager.getEnvName(); }
     public final short getNodeId() { return mServiceManager.getNodeId(); }
     public final String getBaseDir() { return mServiceManager.getBaseDir(); }
-    public final String getDataDir() { return mServiceManager.getDataDir(); }
+    
+    public final String getDataDir() 
+    { return (mDataDir == null) ? mServiceManager.getDataDir() : mDataDir; }
+
     public final short getInstanceId(){return mServiceManager.getInstanceId();}
 }
 

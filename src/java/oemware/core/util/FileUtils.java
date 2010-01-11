@@ -63,6 +63,7 @@ public final class FileUtils {
     private static final String DASH_STR = "-";
     private static final String EMPTY_STR = "";
     private static final String PERIOD_STR = ".";
+    private static final int MAX_EXT_LENGTH = 7;
 
     /**
      * Writes the entire input stream to the file. This class creates a 1024 
@@ -676,6 +677,16 @@ public final class FileUtils {
      * @param pFile The file.
      * @throws CoreException
      */
+    public static final ByteBuffer readFileBuffer(final String pFile) 
+        throws CoreException 
+    { return readFileBuffer(new File(pFile)); }
+
+    /**
+     * Reads a file and closes the file stream/channel. WARNING: This
+     * loads the entire file into memory. Do this for known "small" files.
+     * @param pFile The file.
+     * @throws CoreException
+     */
     public static final ByteBuffer readFileBuffer(final File pFile) 
         throws CoreException 
     {
@@ -785,6 +796,22 @@ public final class FileUtils {
      */
     public static String extractDir(final String pFileName) {
         return pFileName.substring(0, pFileName.lastIndexOf(SLASH));
+    }
+
+    /**
+     * Extract the file extension. Does not include the period. 
+     * @param pFileName The file name.
+     * @return Returns the file extension or null if not available.
+     */
+    public static String extension(final String pFileName) {
+        final int idx = pFileName.lastIndexOf(PERIOD);
+        if (idx == -1) return null;
+        final String ext = pFileName.substring(idx+1, pFileName.length());
+
+        // Check and see if it found a period in the middle.
+        if (ext.length() > MAX_EXT_LENGTH) return null;
+        if (ext.indexOf(SLASH) != -1) return null;
+        return ext;
     }
 
     /**

@@ -55,8 +55,8 @@ public final class InstanceConf extends BaseSharedJob {
      * The file that this key points to is used to populate the attributes
      * here.
      */
-    private final String mSystemPropertyName;
-    private final String mFileName;
+    private String mSystemPropertyName;
+    private String mFileName;
 
     private final Properties mInstanceProperties = new Properties();
     private final ReentrantReadWriteLock mLock = new ReentrantReadWriteLock();
@@ -68,6 +68,11 @@ public final class InstanceConf extends BaseSharedJob {
     public static final String SERVICE_NAME_KEY = "oemware.service.name";
     public static final String ENV_NAME_KEY = "oemware.env.name";
     public static final String DIR_DATA_KEY = "oemware.dir.data";
+
+    /**
+     * Construct a new instance. This is mainly used for unit tests.
+     */
+    public InstanceConf() { }
 
     /**
      * Construct a new instance. You must pass the system property in the
