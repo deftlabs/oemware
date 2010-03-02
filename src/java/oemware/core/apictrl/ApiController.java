@@ -30,6 +30,7 @@ import oemware.core.apictrl.config.ActionDef;
 // Jakarta Commons
 import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.beanutils.MethodUtils;;
+import org.apache.commons.lang.StringUtils;
 
 // Java
 import java.util.List;
@@ -136,8 +137,40 @@ public final class ApiController {
             
             final LinkedList<Object> args = new LinkedList<Object>();
             
-            for (ConstructorArgDef argDef : pControllerDef.getConstructorArg()) 
-            { args.addLast(Kernel.findComponent(argDef.getComponentId())); }
+            for (ConstructorArgDef argDef : pControllerDef.getConstructorArg()) {
+
+                final String componentId = StringUtils.trimToNull(argDef.getComponentId()); 
+                final String value = StringUtils.trimToNull(argDef.getValue()); 
+                final String valueType = StringUtils.trimToNull(argDef.getValueType()); 
+
+                if (componentId != null) {
+                    args.addLast(Kernel.findComponent(componentId));
+                } else if (value != null) {
+                    if (valueType == null) {
+                        throw new IllegalStateException(mName 
+                        + " - vaue requires value-type");
+                    }
+
+                    if (valueType.equals("int")) {
+                        args.addLast(Integer.parseInt(value));
+                    } else if (valueType.equals("double")) {
+                        args.addLast(Double.parseDouble(value));
+                    } else if (valueType.equals("long")) {
+                        args.addLast(Long.parseLong(value));
+                    } else if (valueType.equals("short")) {
+                        args.addLast(Short.parseShort(value));
+                    } else if (valueType.equals("float")) {
+                        args.addLast(Float.parseFloat(value));
+                    } else if (valueType.equals("string")) {
+                        args.addLast(value);
+                    }
+
+                } else {
+                    throw new IllegalStateException(mName 
+                    + " - requires component-id or value");
+                }
+                
+            }
             
             final Controller controller 
             = (Controller)ConstructorUtils.invokeConstructor(clazz, args.toArray(new Object[args.size()]));
