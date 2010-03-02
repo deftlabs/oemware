@@ -48,7 +48,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <xsd:element name="action" type="actionDef"/>
     
     <xsd:complexType name="constructorArgDef">
-        <xsd:attribute name="componentId" type="xsd:string" use="required"/>
+        <xsd:attribute name="componentId" type="xsd:string"/> 
+        <xsd:attribute name="value" type="xsd:string"/>
+        <xsd:attribute name="value-type" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="actionDef">
