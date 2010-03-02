@@ -161,6 +161,8 @@ public final class ApiController {
                         args.addLast(Short.parseShort(value));
                     } else if (valueType.equals("float")) {
                         args.addLast(Float.parseFloat(value));
+                    } else if (valueType.equals("bool")) {
+                        args.addLast(Boolean.parseBoolean(value));
                     } else if (valueType.equals("string")) {
                         args.addLast(value);
                     }
