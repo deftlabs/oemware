@@ -90,13 +90,13 @@ public abstract class MultiThread implements Runnable {
     { this(0l, 0, pThreadName, Thread.NORM_PRIORITY, true); }
 
     /**
-     * Create a new object with params.
+     * Create a new object with params. You need to set the thread count
+     * or this will not run any threads.
      * @param pThreadName The thread name.
      * @param pSleepTime The sleep time.
      */
     public MultiThread( final String pThreadName, final long pSleepTime)
     { this(pSleepTime, 0, pThreadName, Thread.NORM_PRIORITY, true); }
-
 
     /**
      * Create a new object with params.
