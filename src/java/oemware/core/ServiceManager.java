@@ -20,8 +20,9 @@ package oemware.core;
 // OEMware
 import oemware.core.util.ChainUtils;
 import oemware.core.util.SystemUtils;
+import oemware.core.util.FileUtils;
 
-// Jakarta Commons
+// Commons
 import org.apache.commons.chain.Chain;
 import org.apache.commons.chain.Catalog;
 import org.apache.commons.chain.Context;
@@ -31,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 // Java
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.lang.management.ManagementFactory;
 
 /**
  * The service manager. This class is the base for all java applications. When 
@@ -91,6 +93,9 @@ public final class ServiceManager {
     private String mDataDir;
     private boolean mIsCordial = true;
 
+    private String mPid;
+    private String mPidFile;
+
     /**
      * The private constructor. This is a singleton. It reads
      * the system properties.
@@ -100,13 +105,52 @@ public final class ServiceManager {
     { readSystemProperties(); if (mIsCordial) { Cordial.hey(); } }
 
     /**
+     * Remove the pid file.
+     * @throws ServiceException
+     */
+    private void removePidFile() throws ServiceException {
+        try {
+            if (!FileUtils.fileExists(mPidFile)) {
+                throw new ServiceException("Pid does not exist - pid: " + mPid);
+            }
+
+            FileUtils.deleteFile(mPidFile);
+
+        } catch (final Exception e) { throw new ServiceException(e); }
+    }
+
+    /**
+     * Create the pid file.
+     * @throws ServiceException
+     */
+    private void createPidFile() throws ServiceException {
+        try {
+            if (FileUtils.fileExists(mPidFile)) {
+                throw new ServiceException("Pid file exists - server not shutdown properly. File: " 
+                                            + mPidFile 
+                                            + " - remove this file and start server again.");
+            }
+
+            String pid
+            = ManagementFactory.getRuntimeMXBean().getName();
+            final int atIdx = pid.indexOf("@");
+            mPid = pid.substring(0, atIdx);
+
+            FileUtils.writeStrToFile(mPid, mPidFile); 
+
+        } catch (final Exception e) { throw new ServiceException(e); }
+    }
+
+    /**
      * The start hook. Calls the registered startup chain.
      * @throws ServiceException
      */
     public synchronized final void startup() throws ServiceException {
         // Get out of here if we're already running.
         if (isRunning()) return;
-        
+
+        createPidFile();
+      
         mStartTime.set(System.currentTimeMillis());
 
         // Info.
@@ -115,6 +159,8 @@ public final class ServiceManager {
                         + mServiceName
                         + " - env: "
                         + mEnvName
+                        + " - pid: "
+                        + mPid
                         + " -----");
         }
 
@@ -142,6 +188,8 @@ public final class ServiceManager {
                         + mServiceName
                         + " - env: "
                         + mEnvName
+                        + " - pid: "
+                        + mPid 
                         + " - start time: "
                         + (System.currentTimeMillis() - mStartTime.get())
                         + " (ms) -----"); 
@@ -182,6 +230,15 @@ public final class ServiceManager {
             mInstanceId = SystemUtils.getSystemPropertyShort("oemware.instance.id");
             sLog.debug("oemware.instance.id: " + mInstanceId);
 
+            // Create the pid file name.
+            final String pidDir = mBaseDir + "/pid/";
+
+            if (!FileUtils.fileExists(pidDir)) FileUtils.createDir(pidDir);
+
+            mPidFile
+            = pidDir + mEnvName + "-" + mServiceName
+            + "-" + mNodeId + "-" + mInstanceId + ".pid";
+
             // Check to see if the version announcement is enabled.
             try {
             if (SystemUtils.getSystemPropertyBool("oemware.cordial")) 
@@ -207,6 +264,8 @@ public final class ServiceManager {
                             + mServiceName
                             + " - env: "
                             + mEnvName
+                            + " - pid: "
+                            + mPid 
                             + " -----");
         }
 
@@ -221,12 +280,16 @@ public final class ServiceManager {
         mRunState.set(STATE_STOPPED);
         final long currentTime = System.currentTimeMillis();
 
+        removePidFile();
+
         // Info.
         if (sLog.isInfoEnabled()) {
             sLog.info(  "----- stopped service:  "
                         + mServiceName
                         + " - env: "
                         + mEnvName
+                        + " - pid: "
+                        + mPid 
                         + " - stop time: "
                         + (currentTime - shutdownStartTime)
                         + " (ms) "
