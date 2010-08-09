@@ -127,6 +127,30 @@ public final class ServiceConf {
     }
 
     /**
+     * Returns true if the property is found
+     * @param pName The property name (required).
+     * @return True if the property is set.
+     */
+    public final boolean hasProperty(final String pName) 
+        throws ServiceException 
+    {
+        try { 
+            mInstanceConf.getProperty(pName);
+            return true;
+        } catch (ServiceException ise) { 
+            try { 
+                mModuleConf.getProperty(pName);
+                return true;
+            } catch (ServiceException nse) {
+                try { 
+                    mNodeConf.getProperty(pName);
+                    return true;
+                } catch (ServiceException ngse) { return false; }
+            }
+        }
+    }
+
+    /**
      * Returns an integer property value (works same as string version).
      * @param pName The property name (required).
      * @return The value. An exception is thrown if not available.
@@ -235,9 +259,10 @@ public final class ServiceConf {
         throws ServiceException
     { mInstanceConf.setProperty(pName, pValue);  }
 
-    public final String getServiceName() {
-        return mServiceManager.getServiceName();
-    }
+    public final String getServiceName() 
+    { return mServiceManager.getServiceName(); }
+
+
     public final String getEnvName() { return mServiceManager.getEnvName(); }
     public final short getNodeId() { return mServiceManager.getNodeId(); }
     public final String getBaseDir() { return mServiceManager.getBaseDir(); }
