@@ -20,7 +20,7 @@ package oemware.core.util;
 // OEMware
 import oemware.core.CoreException;
 
-// java
+// Java
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,6 +35,11 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Schema;
 import org.xml.sax.SAXException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * The jaxb xml utils. 
@@ -168,6 +173,42 @@ public final class JaxbUtils {
             } finally { if (input != null) input.close(); }
         } catch (JAXBException jaxbe) { throw new CoreException(jaxbe);
         } catch (IOException ioe) { throw new CoreException(ioe); }
+    }
+
+    /**
+     * Does a jaxb parse.
+     * @param pFileName The file name. This expects the file in the classpath.
+     * @param pPackage The package where the jaxb generated files are 
+     * located.
+     * @param pSchemaFile The schema file for validating.
+     * @return The object.
+     * @throws CoreException
+     */
+    public static Object jaxbUnmarshal( final String pFileName, 
+                                        final String pPackage,
+                                        final String pSchemaFile) 
+        throws CoreException
+    {
+        try {
+            final InputStream input = ClasspathUtils.openResourceUrl(pFileName);
+            try {
+
+                final SchemaFactory sf 
+                = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+                final Schema schema 
+                = sf.newSchema(new StreamSource(ClasspathUtils.openResourceUrl(pSchemaFile)));
+
+                final JAXBContext context = JAXBContext.newInstance(pPackage);
+                final Unmarshaller unmarshaller = context.createUnmarshaller();
+                unmarshaller.setSchema(schema);
+
+                final JAXBElement element = (JAXBElement)unmarshaller.unmarshal(input);
+
+                return element.getValue();
+
+            } finally { if (input != null) input.close(); }
+        } catch (final Exception e) { throw new CoreException(e); }
     }
 
     /**
