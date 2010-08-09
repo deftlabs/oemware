@@ -43,6 +43,13 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.net.NetworkInterface;
+import java.net.InetAddress;
+import java.net.Inet6Address;
+import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 
 /**
  * The embedded tomcat service. This is a servlet engine/web server
@@ -66,6 +73,7 @@ public final class TomcatService implements ApplicationListener {
     private Connector mHttpConnector;
     private Context mTomcatContext;
     private Host mTomcatHost;
+
     private Engine mTomcatEngine;
 
     private static final String TOMCAT_PROTOCOL 
@@ -193,6 +201,7 @@ public final class TomcatService implements ApplicationListener {
         mTomcatEngine.setName(mEngineName);
         mTomcatEngine.setJvmRoute(mJvmRouteId);
         mTomcatEngine.addChild(mTomcatHost);
+        
         mTomcatEngine.setDefaultHost(mTomcatHost.getName());
     }
 
@@ -214,6 +223,31 @@ public final class TomcatService implements ApplicationListener {
     }
 
     /**
+     * Returns the network addresses for the machine.
+     * @return The ip addresses.
+     */
+    public List<String> getServerAddrs() throws ServiceException {
+        try {
+    
+            final List<String> values = new ArrayList<String>();
+            final Enumeration<NetworkInterface> nets 
+            = NetworkInterface.getNetworkInterfaces();
+
+            for (final NetworkInterface netint : Collections.list(nets)) {
+                final Enumeration<InetAddress> inetAddresses 
+                = netint.getInetAddresses();
+
+                for (InetAddress addr : Collections.list(inetAddresses)) {
+                    if (addr instanceof Inet6Address) continue;
+                    values.add(addr.getHostAddress());
+                }
+            }
+            
+            return values;
+        } catch (final Exception e) { throw new ServiceException(e); }
+    }
+
+    /**
      * Initialize the host.
      * @throws ServiceException
      */
@@ -221,11 +255,31 @@ public final class TomcatService implements ApplicationListener {
 
         try {
             final String hostPath = (mCatalinaHome + mAppName);
+
+            boolean missingHostname = false;
             if (StringUtils.isBlank(mHostname)) {
-                mHostname = InetAddress.getLocalHost().getHostAddress();
-            }
+                missingHostname = true;
+                for (final String addr : getServerAddrs()) {
+                    if (addr.equals("127.0.0.1")) continue;
+                    mHostname = addr;
+                    break;
+                }
+
+                if (mHostname == null) mHostname = "127.0.0.1";
+            } 
+
             mTomcatHost = mTomcat.createHost(mHostname, hostPath);
-        } catch (UnknownHostException uhe) { throw new ServiceException(uhe); }
+
+            if (missingHostname) {
+                for (final String addr : getServerAddrs()) {
+                    if (mHostname.equals(addr)) continue; 
+                    mTomcatHost.addAlias(addr);
+                }
+            } else if (!mHostname.equals("127.0.0.1")) { 
+                mTomcatHost.addAlias("127.0.0.1");
+            }
+
+        } catch (final Exception e) { throw new ServiceException(e); }
     }
 
     /**
