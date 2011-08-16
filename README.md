@@ -5,6 +5,10 @@ OEMware
 About
 ------------
 
+Currently, OEMware is undergoing a lot of changes and should not be used.
+
+For the older version, see the [deprecated-08-24-2010 tag](https://github.com/deftlabs/oemware/tree/deprecated-08-24-2010).
+
 OEMware is a set of open source reusable libraries and scripts that simplify the development of new server software.
 
 Documentation
