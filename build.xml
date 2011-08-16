@@ -1,111 +1,59 @@
 <?xml version="1.0"?>
+
 <!--
-(C) Copyright 2007, Deft Labs.
+Copyright 2011, Deft Labs.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+http://www.apache.org/licenses/LICENSE-2.0
 
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 
-<!DOCTYPE project [
-    <!ENTITY java-build SYSTEM "./scripts/build/ant/java_build.xml">
-    <!ENTITY java-package SYSTEM "./scripts/build/ant/java_package.xml">
-    <!ENTITY java-module SYSTEM "./scripts/build/ant/java_module.xml">
-    <!ENTITY java-unit SYSTEM "./scripts/build/ant/java_unit.xml">
-    <!ENTITY java-jaxb SYSTEM "./scripts/build/ant/java_jaxb.xml">
-]>
-
-<project name="oemware" default="usage" basedir="./" xmlns:aspectj="antlib:org.aspectj">
+<project name="oemware" default="usage" basedir="./" xmlns:aspectj="antlib:org.aspectj" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <!-- ******************************************************************* -->
     <!-- Set the base attributes.                                            -->
     <!-- ******************************************************************* -->
 
-    <property file="conf/build/build.properties"/>
-    <tstamp><format property="current-time" pattern="yyyy-MM-dd HH:mm z"/></tstamp>
+    <property name="dir.build" value="build"/>
+    <property name="dir.build.java" value="${dir.build}/java/classes"/>
+    <property name="dir.build.release" value="${dir.build}/oemware"/>
+
+    <property name="dir.src" value="src"/>
     <property name="dir.src.java" value="src/main"/>
-    <property name="dir.src.java.generate" value="build/src/java"/>
     <property name="dir.src.java.unit" value="src/unit"/>
-    <property name="dir.java.build" value="${dir.build}/java/classes"/>
-    <property name="javac.source" value="1.6"/>
-    <property name="dir.java.lib.common" value="lib/java/"/>
-    <property name="dir.dist" value="dist"/>
-    <property name="dir.docs" value="docs"/>
-    <path id="classpath.all"><fileset dir="${dir.java.lib.common}"><include name="*.jar"/></fileset></path>
-    <path id="classpath.cp"><pathelement location="${dir.java.build}"/></path>
+    <property name="dir.src.java.test" value="src/test"/>
+    <property name="dir.lib" value="lib"/>
+    <property name="dir.conf" value="conf"/>
+
+    <property file="build.properties" prefix="build.conf"/>
+
+    <property environment="env"/>
+
+    <path id="classpath.all">
+        <fileset dir="${dir.lib}"><include name="*.jar"/></fileset>
+    </path>
+
+    <path id="classpath.cp"><pathelement location="${dir.build.java}"/></path>
 
     <!-- ******************************************************************* -->
-    <!-- The includes.                                                       -->
+    <!-- Set the Maven attributes.                                           -->
     <!-- ******************************************************************* -->
 
-    &java-build;
-    &java-package;
-    &java-module;
-    &java-unit;
-    &java-jaxb;
+    <property name="groupId" value="com.deftlabs"/>
+    <property name="artifactId" value="oemware"/>
 
-    <!-- ******************************************************************* -->
-    <!-- Package the jar file.                                               -->
-    <!-- ******************************************************************* -->
-
-    <target name="package.jar" depends="compile.java">
-        <mkdir dir="${dir.dist}"/>
-        <jar destfile="${dir.dist}/oemware.jar" basedir="${dir.java.build}"/>
-    </target>
-
-    <!-- ******************************************************************* -->
-    <!-- Init the dev environment.                                           -->
-    <!-- ******************************************************************* -->
-
-    <target name="init">
-        <mkdir dir="${dir.src.java.generate}"/>
-        <antcall target="generate.jaxb.all"/>
-    </target>
-
-    <!-- ******************************************************************* -->
-    <!-- Package the entire release.                                         -->
-    <!-- ******************************************************************* -->
-
-    <target name="package" depends="package.jar,javadoc">
-        <mkdir dir="${dir.dist}/release/oemware"/>
-        <mkdir dir="${dir.dist}/release/oemware/docs/api"/>
-        <mkdir dir="${dir.dist}/release/oemware/scripts/service/module"/>
-        <copy file="${dir.dist}/oemware.jar" tofile="${dir.dist}/release/oemware/oemware.jar"/>
-        <copy todir="${dir.dist}/release/oemware/docs/api"><fileset dir="${dir.docs}/api"/></copy>
-        <copy todir="${dir.dist}/release/oemware/scripts/service/module"><fileset dir="scripts/service/module"/></copy>
-        <zip destfile="${dir.dist}/oemware-${release.version}.zip" basedir="${dir.dist}/release"/>
-    </target>
-
-    <!-- ******************************************************************* -->
-    <!-- Generate the Javadocs.                                              -->
-    <!-- ******************************************************************* -->
-
-    <target name="javadoc">
-        <mkdir dir="${dir.docs}/api"/>
-        <javadoc    packagenames="oemware.core.*"
-                    sourcepath="src/java"
-                    defaultexcludes="yes"
-                    destdir="${dir.docs}/api"
-                    author="false"
-                    version="false"
-                    use="true"
-                    windowtitle="OEMware API">
-            <doctitle><![CDATA[<a href="http://oemware.com"><img src="http://oemware.com/img/oemware_logo_sm.png" style="border:0;" alt="OEMware logo" /></a>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright &#169; 2009 <a href="http://deftlabs.com">Deft Labs</a> - Released under <a href="http://www.opensource.org/licenses/lgpl-3.0.html">LGPL, Version 3.0</a></i><script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); </script>]]></bottom>
-            <classpath refid="classpath.all"/>
-        </javadoc>
-    </target>
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots"/>
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots"/>
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging"/>
+    <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/"/>
 
     <!-- ******************************************************************* -->
     <!-- Remove the build directory.                                         -->
@@ -113,9 +61,186 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
 
     <target name="clean">
         <delete dir="${dir.build}"/>
-        <delete dir="${dir.dist}"/>
-        <delete dir="${dir.docs}"/>
-        <antcall target="init"/>
+        <delete file="conf/maven-oemware.xml.asc"/>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Compile the java classes.                                           -->
+    <!-- ******************************************************************* -->
+
+    <target name="compile">
+        <mkdir dir="${dir.build.java}"/>
+        <javac  destdir="${dir.build.java}"
+                target="${build.conf.javac.source}"
+                debug="true" encoding="UTF-8"
+                classpathref="classpath.cp"
+                source="${build.conf.javac.source}"
+                includeantruntime="false"
+                debuglevel="lines,vars,source">
+
+            <src path="${dir.src.java}"/>
+            <src path="${dir.src.java.unit}"/>
+            <src path="${dir.src.java.test}"/>
+            <compilerarg value="-Xlint:all,-fallthrough"/>
+            <classpath refid="classpath.all"/>
+        </javac>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Create the jar file.                                                -->
+    <!-- ******************************************************************* -->
+
+    <target name="jar" depends="clean, unit, compile">
+        <mkdir dir="${dir.build}/dist"/>
+        <jar destfile="${dir.build}/dist/oemware.jar" basedir="${dir.build.java}" manifest="src/main/META-INF/MANIFEST.MF"></jar>
+
+       <copy file="conf/maven-oemware.xml" tofile="${dir.build}/maven-oemware.xml" filtering="true">
+            <filterset><filter token="VERSION" value="${build.conf.lib.version}"/></filterset>
+        </copy>
+
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Create the additional jars.                                         -->
+    <!-- ******************************************************************* -->
+
+    <target name="jar.all" depends="jar, javadocs">
+
+        <jar jarfile="${dir.build}/dist/oemware-sources-${build.conf.lib.version}.jar"><fileset dir="src/main"/></jar>
+
+        <jar jarfile="${dir.build}/dist/oemware-javadoc-${build.conf.lib.version}.jar"><fileset dir="${dir.build}/javadocs"/></jar>
+
+        <copy file="${dir.build}/dist/oemware.jar" tofile="${dir.build}/dist/oemware-${build.conf.lib.version}.jar"/>
+
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Run the isolated unit tests.                                        -->
+    <!-- ******************************************************************* -->
+
+    <target name="unit" depends="compile">
+        <junit fork="yes" haltonfailure="true">
+            <jvmarg value="-Duser.timezone=GMT"/>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+            <classpath refid="classpath.all"/>
+
+            <classpath>
+                <pathelement path="${dir.build.java}"/>
+                <pathelement path="${dir.conf}"/>
+            </classpath>
+
+            <formatter type="brief" usefile="false"/>
+
+            <batchtest todir=".">
+                <fileset dir="${dir.build.java}">
+                    <include name="**/*UnitTests.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Run the integration tests. Server must be running to work.          -->
+    <!-- ******************************************************************* -->
+
+    <target name="test" depends="compile">
+
+        <junit fork="yes" haltonfailure="true">
+            <jvmarg value="-Duser.timezone=GMT"/>
+            <jvmarg value="-Dfile.encoding=UTF-8"/>
+            <classpath refid="classpath.all"/>
+
+            <classpath>
+                <pathelement path="${dir.build.java}"/>
+                <pathelement path="${dir.conf}"/>
+            </classpath>
+
+            <formatter type="brief" usefile="false"/>
+
+            <batchtest todir=".">
+                <fileset dir="${dir.build.java}">
+                    <include name="**/*IntTests.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Generate the Javadocs.                                              -->
+    <!-- ******************************************************************* -->
+
+    <target name="javadocs" depends="compile" description="Generate Javadocs">
+        <delete dir="${dir.build}/javadocs/"/>
+
+        <javadoc
+            packagenames="com.deftlabs.logging.mongo"
+            sourcepath="src/main/"
+            defaultexcludes="yes"
+            destdir="${dir.build}/javadocs"
+            author="true"
+            version="true"
+            source="1.5"
+            use="true"
+            access="protected">
+
+            <link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
+            <classpath refid="classpath.all"/>
+        </javadoc>
+
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Deploy to Maven repository.                                         -->
+    <!-- ******************************************************************* -->
+
+    <target name="maven.snapshot" depends="jar.all" description="Deploy a snapshot version to Maven snapshot repository">
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file"/>
+            <arg value="-Durl=${maven-snapshots-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-snapshots-repository-id}"/>
+            <arg value="-DpomFile=${dir.build}/maven-oemware.xml"/>
+            <arg value="-Dfile=${dir.build}/dist/oemware-${build.conf.lib.version}.jar"/>
+        </artifact:mvn>
+    </target>
+
+    <!-- ******************************************************************* -->
+    <!-- Stage in the Maven repository.                                      -->
+    <!-- ******************************************************************* -->
+
+    <target name="maven.stage" depends="jar.all" description="Deploy release version to Maven staging repository">
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=${dir.build}/maven-oemare.xml"/>
+            <arg value="-Dfile=${dir.build}/dist/oemware-${build.conf.lib.version}.jar"/>
+            <arg value="-Dkeyname=665C1184"/>
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=${dir.build}/maven-oemware.xml"/>
+            <arg value="-Dfile=${dir.build}/dist/oemware-sources-${build.conf.lib.version}.jar"/>
+            <arg value="-Dclassifier=sources"/>
+            <arg value="-Dkeyname=665C1184"/>
+            <arg value="-Pgpg"/>
+        </artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=${dir.build}/maven-oemware.xml"/>
+            <arg value="-Dfile=${dir.build}/dist/oemware-javadoc-${build.conf.lib.version}.jar"/>
+            <arg value="-Dclassifier=javadoc"/>
+            <arg value="-Dkeyname=665C1184"/>
+            <arg value="-Pgpg"/>
+        </artifact:mvn>
+
     </target>
 
     <!-- ******************************************************************* -->
@@ -126,19 +251,19 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
 <echo>
 ----------------------------------------
 
-- Compile the Java files ......................... compile.java
+- Compile the Java files ......................... compile
 
-- Package jar file ............................... package.jar
+- Create the jar file ............................ jar
 
-- Package the dev module ......................... package.devmodule
+- Create ALL of the build jar files .............. jar.all
 
-- Package the release ............................ package
+- Clean the source tree .......................... clean
 
-- Create Javadocs ................................ javadoc
+- Run the unit tests ............................. unit
 
-- Run unit tests ................................. unit
+- Run the integration tests ...................... test
 
-- Clean the build and package dirs ............... clean
+- Generate the Javadocs .......................... javadocs
 
 ----------------------------------------
 </echo>
