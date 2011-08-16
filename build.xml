@@ -173,7 +173,7 @@ limitations under the License.
         <delete dir="${dir.build}/javadocs/"/>
 
         <javadoc
-            packagenames="com.deftlabs.logging.mongo"
+            packagenames="com.deftlabs.core, com.deftlabs.core.util"
             sourcepath="src/main/"
             defaultexcludes="yes"
             destdir="${dir.build}/javadocs"
