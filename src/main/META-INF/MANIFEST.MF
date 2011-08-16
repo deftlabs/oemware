@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: oemware
+Bundle-SymbolicName: com.deftlabs.core
+Bundle-Version: @VERSION@
+Import-Package: org.mortbay.jetty, org.mortbay.xml, org.mortbay.jetty.webapp, org.mortbay.jetty.servlet
+Export-Package: com.deftlabs.core, com.deftlabs.core.util, com.deftlabs.core.net
