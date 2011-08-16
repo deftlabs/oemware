@@ -3,7 +3,7 @@
 (C) Copyright 2007, Deft Labs.
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published 
+it under the terms of the GNU Lesser General Public License as published
 by the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
 -->
 
-<!DOCTYPE project [ 
-    <!ENTITY db SYSTEM "./scripts/build/ant/db.xml"> 
-    <!ENTITY java-build SYSTEM "./scripts/build/ant/java_build.xml"> 
+<!DOCTYPE project [
+    <!ENTITY java-build SYSTEM "./scripts/build/ant/java_build.xml">
     <!ENTITY java-package SYSTEM "./scripts/build/ant/java_package.xml">
     <!ENTITY java-module SYSTEM "./scripts/build/ant/java_module.xml">
     <!ENTITY java-unit SYSTEM "./scripts/build/ant/java_unit.xml">
@@ -35,9 +34,9 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
 
     <property file="conf/build/build.properties"/>
     <tstamp><format property="current-time" pattern="yyyy-MM-dd HH:mm z"/></tstamp>
-    <property name="dir.src.java" value="src/java"/>
+    <property name="dir.src.java" value="src/main"/>
     <property name="dir.src.java.generate" value="build/src/java"/>
-    <property name="dir.src.java.unit" value="src/unit_java"/>
+    <property name="dir.src.java.unit" value="src/unit"/>
     <property name="dir.java.build" value="${dir.build}/java/classes"/>
     <property name="javac.source" value="1.6"/>
     <property name="dir.java.lib.common" value="lib/java/"/>
@@ -60,7 +59,7 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
     <!-- Package the jar file.                                               -->
     <!-- ******************************************************************* -->
 
-    <target name="package.jar" depends="compile.java"> 
+    <target name="package.jar" depends="compile.java">
         <mkdir dir="${dir.dist}"/>
         <jar destfile="${dir.dist}/oemware.jar" basedir="${dir.java.build}"/>
     </target>
@@ -78,7 +77,7 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
     <!-- Package the entire release.                                         -->
     <!-- ******************************************************************* -->
 
-    <target name="package" depends="package.jar,javadoc"> 
+    <target name="package" depends="package.jar,javadoc">
         <mkdir dir="${dir.dist}/release/oemware"/>
         <mkdir dir="${dir.dist}/release/oemware/docs/api"/>
         <mkdir dir="${dir.dist}/release/oemware/scripts/service/module"/>
@@ -92,9 +91,9 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
     <!-- Generate the Javadocs.                                              -->
     <!-- ******************************************************************* -->
 
-    <target name="javadoc"> 
+    <target name="javadoc">
         <mkdir dir="${dir.docs}/api"/>
-        <javadoc    packagenames="oemware.core.*" 
+        <javadoc    packagenames="oemware.core.*"
                     sourcepath="src/java"
                     defaultexcludes="yes"
                     destdir="${dir.docs}/api"
@@ -104,7 +103,7 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
                     windowtitle="OEMware API">
             <doctitle><![CDATA[<a href="http://oemware.com"><img src="http://oemware.com/img/oemware_logo_sm.png" style="border:0;" alt="OEMware logo" /></a>]]></doctitle>
             <bottom><![CDATA[<i>Copyright &#169; 2009 <a href="http://deftlabs.com">Deft Labs</a> - Released under <a href="http://www.opensource.org/licenses/lgpl-3.0.html">LGPL, Version 3.0</a></i><script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www."); document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); </script>]]></bottom>
-            <classpath refid="classpath.all"/> 
+            <classpath refid="classpath.all"/>
         </javadoc>
     </target>
 
@@ -118,7 +117,7 @@ Version: $Id: build.xml 100 2009-01-09 22:55:14Z oemware $
         <delete dir="${dir.docs}"/>
         <antcall target="init"/>
     </target>
-        
+
     <!-- ******************************************************************* -->
     <!-- Describe the build file usage.                                      -->
     <!-- ******************************************************************* -->
