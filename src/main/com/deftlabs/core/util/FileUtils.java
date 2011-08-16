@@ -44,9 +44,6 @@ import java.util.UUID;
 
 /**
  * The file utils.
- *
- * @author Ryan Nitz
- * @version $Id: FileUtils.java 99 2009-01-06 19:13:33Z oemware $
  */
 public final class FileUtils {
 
@@ -407,8 +404,6 @@ public final class FileUtils {
      * @param pDataDir The data directory.
      * @param pFilter The file filter.
      * @param pMaxFiles The maximum number of files.
-     * @param pFileNames This is set to null to start. If for whatever reason
-     * you pass in file names, they will be preserved.
      * @return The file names.
      */
     public static final String [] getFileNamesRecursive(final String pDataDir,
@@ -639,7 +634,7 @@ public final class FileUtils {
     /**
      * Reads a file and closes the file stream/channel. WARNING: This
      * loads the entire file into memory. Do this for known "small" files.
-     * @param pFile The file.
+     * @param pFileName The file name.
      * @throws OemException
      */
     public static final String readFileStr(final String pFileName)
@@ -1211,7 +1206,7 @@ public final class FileUtils {
     /**
      * Checks to see if the object passed is a directory.
      * @param pFile The file.
-     * @returns True if the location is a directory.
+     * @return True if the location is a directory.
      * @throws OemException
      */
     public final static boolean isDir(final String pFile)
@@ -1220,7 +1215,7 @@ public final class FileUtils {
     /**
      * Checks to see if the object passed is a directory.
      * @param pFile The file.
-     * @returns True if the location is a directory.
+     * @return True if the location is a directory.
      */
     public final static boolean isDir(final File pFile)
     { return pFile.isDirectory(); }
