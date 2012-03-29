@@ -30,7 +30,6 @@ public class OemException extends RuntimeException {
 
     public OemException(Throwable pThrowable) { super(pThrowable); }
 
-    public OemException(String pMessage, Throwable pThrowable)
-    { super(pMessage, pThrowable); }
+    public OemException(String pMessage, Throwable pThrowable) { super(pMessage, pThrowable); }
 }
 
