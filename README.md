@@ -5,7 +5,7 @@ oemware
 About
 ------------
 
-OEMware is a set of open source reusable libraries and scripts that simplify the development of new server software.
+OEMware is a set of open source Java utilities
 
 Usage
 ------------
