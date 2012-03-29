@@ -27,15 +27,12 @@ import java.util.LinkedHashMap;
  * An lru linked hash map. Access to this map is thread-safe. This class also
  * supports an optional eviction handler. To handle old data that is removed
  * from the map.
- *
- * @author Ryan Nitz
- * @version $Id: LruMap.java 13 2008-06-15 19:43:04Z oemware $
  */
 public class LruMap<K,V> implements Map<K, V> {
 
-    private final LinkedHashMap<K,V> mMap;
-    private final LruMap.EvictionHandler<K, V> mHandler;
-    private final int mSize;
+    private final LinkedHashMap<K,V> _map;
+    private final LruMap.EvictionHandler<K, V> _handler;
+    private final int _size;
 
     private static final float LOAD_FACTOR = 0.75f;
 
@@ -53,65 +50,65 @@ public class LruMap<K,V> implements Map<K, V> {
     public LruMap(  final int pSize,
                     final LruMap.EvictionHandler<K, V> pHandler)
     {
-        mSize = pSize;
-        mHandler = pHandler;
+        _size = pSize;
+        _handler = pHandler;
 
-        final int capacity = (int)Math.ceil(mSize / LOAD_FACTOR) + 1;
+        final int capacity = (int)Math.ceil(_size / LOAD_FACTOR) + 1;
 
-        mMap = new LinkedHashMap<K,V>(capacity, LOAD_FACTOR, true) {
+        _map = new LinkedHashMap<K,V>(capacity, LOAD_FACTOR, true) {
             private static final long serialVersionUID = 1L;
             @Override protected boolean removeEldestEntry(Map.Entry<K,V> pEldest) {
-                final boolean remove = (size() > LruMap.this.mSize);
+                final boolean remove = (size() > LruMap.this._size);
                 if (!remove) return remove;
 
-                if (mHandler == null) return remove;
+                if (_handler == null) return remove;
 
-                LruMap.this.mHandler.execute(pEldest);
+                LruMap.this._handler.execute(pEldest);
 
                 return remove;
             }
         };
     }
 
-    public final synchronized void clear() { mMap.clear(); }
-    public final synchronized int size() { return mMap.size(); }
-    public final synchronized Collection<V> values() { return mMap.values(); }
-    public final synchronized int hashCode() { return mMap.hashCode(); }
+    public final synchronized void clear() { _map.clear(); }
+    public final synchronized int size() { return _map.size(); }
+    public final synchronized Collection<V> values() { return _map.values(); }
+    public final synchronized int hashCode() { return _map.hashCode(); }
 
     public final synchronized V get (final Object pKey) {
-        return mMap.get(pKey);
+        return _map.get(pKey);
     }
 
     public final synchronized boolean containsKey(final Object pKey) {
-        return mMap.containsKey(pKey);
+        return _map.containsKey(pKey);
     }
 
     public final synchronized boolean containsValue(final Object pValue) {
-        return mMap.containsValue(pValue);
+        return _map.containsValue(pValue);
     }
 
     public final synchronized Set<Map.Entry<K,V>> entrySet() {
-        return mMap.entrySet();
+        return _map.entrySet();
     }
 
-    public final synchronized boolean isEmpty() { return mMap.isEmpty(); }
+    public final synchronized boolean isEmpty() { return _map.isEmpty(); }
 
-    public final synchronized Set<K> keySet() { return mMap.keySet(); }
+    public final synchronized Set<K> keySet() { return _map.keySet(); }
 
     public final synchronized V put (K pKey, V pValue) {
-        return mMap.put(pKey, pValue);
+        return _map.put(pKey, pValue);
     }
 
     public final synchronized V remove(final Object pKey) {
-        return mMap.remove(pKey);
+        return _map.remove(pKey);
     }
 
     public final synchronized void putAll(Map   <? extends K,
                                                 ? extends V> pValues)
-    { mMap.putAll(pValues); }
+    { _map.putAll(pValues); }
 
     public final synchronized boolean equals(final Object pValue) {
-         return mMap.equals(pValue);
+         return _map.equals(pValue);
     }
 
     /**

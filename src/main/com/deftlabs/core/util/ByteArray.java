@@ -37,9 +37,7 @@ public final class ByteArray {
      * Creates an empty byte array. The data must be set. You must manually
      * set the length.
      */
-    public ByteArray() {
-        offset = 0;
-    }
+    public ByteArray() { offset = 0; }
 
     /**
      * Create a new byte array with the data. The offset is set to zero
@@ -109,9 +107,7 @@ public final class ByteArray {
      */
     public final int hashCode() {
         int result = 1;
-        for (int idx=0; idx < length; idx++) {
-            result = 31 * result + data[idx + offset];
-        }
+        for (int idx=0; idx < length; idx++) result = 31 * result + data[idx + offset];
         return result;
     }
 
@@ -119,8 +115,6 @@ public final class ByteArray {
      * This is for debug only. It creates a string of the object.
      * @return A new string object.
      */
-    public final String toString() {
-        return new String(data, offset, length);
-    }
+    public final String toString() { return new String(data, offset, length); }
 }
 

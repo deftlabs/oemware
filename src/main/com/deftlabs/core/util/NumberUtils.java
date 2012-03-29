@@ -23,9 +23,6 @@ import java.math.BigDecimal;
 
 /**
  * The number utils.
- *
- * @author Ryan Nitz
- * @version $Id: NumberUtils.java 32 2008-06-30 13:05:44Z oemware $
  */
 public final class NumberUtils {
 

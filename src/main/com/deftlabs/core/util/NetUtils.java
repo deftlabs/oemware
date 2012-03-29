@@ -23,9 +23,6 @@ import java.net.UnknownHostException;
 
 /**
  * The network utils.
- *
- * @author Ryan Nitz
- * @version $Id: NetUtils.java 13 2008-06-15 19:43:04Z oemware $
  */
 public final class NetUtils {
 

@@ -24,9 +24,6 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * The io utils.
- *
- * @author Ryan Nitz
- * @version $Id: IoUtils.java 103 2009-01-09 23:00:33Z oemware $
  */
 public class IoUtils {
 
@@ -44,14 +41,10 @@ public class IoUtils {
                                                 final int pReadSize)
         throws IOException
     {
-        if (pInputStream == null)
-            throw new IllegalArgumentException("Null input stream.");
+        if (pInputStream == null) throw new IllegalArgumentException("Null input stream.");
+        if (pReadSize < 1) throw new IllegalArgumentException("Read size is: " + pReadSize);
 
-        if (pReadSize < 1)
-            throw new IllegalArgumentException("Read size is: " + pReadSize);
-
-        final ByteArrayOutputStream out
-        = new ByteArrayOutputStream(pReadSize);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(pReadSize);
         final byte [] buffer = new byte[pReadSize];
 
         int read = 0;

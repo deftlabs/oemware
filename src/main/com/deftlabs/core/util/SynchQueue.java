@@ -26,14 +26,13 @@ import java.util.concurrent.SynchronousQueue;
  */
 public final class SynchQueue<T> {
 
-    private volatile BlockingQueue<T> mQueue;
+    private volatile BlockingQueue<T> _queue;
 
     /**
      * Construct a new queue.
      * @param pFair Set to true fo fair.
      */
-    public SynchQueue(final boolean pFair)
-    { mQueue = new SynchronousQueue<T>(pFair); }
+    public SynchQueue(final boolean pFair) { _queue = new SynchronousQueue<T>(pFair); }
 
     /**
      * Construct a new queue (default not fair).
@@ -45,14 +44,12 @@ public final class SynchQueue<T> {
      * @return The new object.
      * @throws InterruptedException
      */
-    public final T take() throws InterruptedException
-    { return mQueue.take(); }
+    public final T take() throws InterruptedException { return _queue.take(); }
 
     /**
      * Add an element.
      * @throws InterruptedException
      */
-    public final void put(final T pObj) throws InterruptedException
-    { mQueue.put(pObj); }
+    public final void put(final T pObj) throws InterruptedException { _queue.put(pObj); }
 }
 
