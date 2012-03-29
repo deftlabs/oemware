@@ -29,7 +29,6 @@ limitations under the License.
     <property name="dir.src" value="src"/>
     <property name="dir.src.java" value="src/main"/>
     <property name="dir.src.java.unit" value="src/unit"/>
-    <property name="dir.src.java.test" value="src/test"/>
     <property name="dir.lib" value="lib"/>
     <property name="dir.conf" value="conf"/>
 
@@ -80,7 +79,6 @@ limitations under the License.
 
             <src path="${dir.src.java}"/>
             <src path="${dir.src.java.unit}"/>
-            <src path="${dir.src.java.test}"/>
             <compilerarg value="-Xlint:all,-fallthrough"/>
             <classpath refid="classpath.all"/>
         </javac>
@@ -140,32 +138,6 @@ limitations under the License.
     </target>
 
     <!-- ******************************************************************* -->
-    <!-- Run the integration tests. Server must be running to work.          -->
-    <!-- ******************************************************************* -->
-
-    <target name="test" depends="compile">
-
-        <junit fork="yes" haltonfailure="true">
-            <jvmarg value="-Duser.timezone=GMT"/>
-            <jvmarg value="-Dfile.encoding=UTF-8"/>
-            <classpath refid="classpath.all"/>
-
-            <classpath>
-                <pathelement path="${dir.build.java}"/>
-                <pathelement path="${dir.conf}"/>
-            </classpath>
-
-            <formatter type="brief" usefile="false"/>
-
-            <batchtest todir=".">
-                <fileset dir="${dir.build.java}">
-                    <include name="**/*IntTests.class"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
-    <!-- ******************************************************************* -->
     <!-- Generate the Javadocs.                                              -->
     <!-- ******************************************************************* -->
 
@@ -173,7 +145,7 @@ limitations under the License.
         <delete dir="${dir.build}/javadocs/"/>
 
         <javadoc
-            packagenames="com.deftlabs.core, com.deftlabs.core.util"
+            packagenames="com.deftlabs.core, com.deftlabs.core.util, com.deftlabs.core.net"
             sourcepath="src/main/"
             defaultexcludes="yes"
             destdir="${dir.build}/javadocs"
@@ -260,8 +232,6 @@ limitations under the License.
 - Clean the source tree .......................... clean
 
 - Run the unit tests ............................. unit
-
-- Run the integration tests ...................... test
 
 - Generate the Javadocs .......................... javadocs
 
