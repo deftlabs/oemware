@@ -12,6 +12,12 @@ Usage
 
 * [Javadocs](http://api.deftlabs.com/oemware)
 
+
+Build
+------------
+
+[![Build Status](https://secure.travis-ci.org/deftlabs/oemware.png)](http://travis-ci.org/deftlabs/oemware)
+
 License
 ------------
 
