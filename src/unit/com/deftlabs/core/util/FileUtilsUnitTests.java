@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * The file utils tests.
@@ -127,6 +129,41 @@ public final class FileUtilsUnitTests {
 
         // Cleanup.
         deleteDir(scratchDir);
+    }
+    
+    @Test
+    public final void writeInputStreamtoFile() throws Exception {
+        // Generate 10mb of randomness
+        final Random entropy = new Random();
+        final byte[] randBytes = new byte[1024 * 10];
+        entropy.nextBytes(randBytes);
+
+        // Copy bytes for comparison later
+        final byte[] randBytesCopy = new byte[1024 * 10];
+        System.arraycopy(randBytes, 0, randBytesCopy, 0, randBytes.length);
+
+        // Generate an InputStream from the junk
+        final InputStream in = new ByteArrayInputStream(randBytes);
+        
+        // Call the method we want to test, use a 1mb buffer
+        final String fileName = "/tmp/fileUtilsBytes.dat";
+        // if file is already there, delete it
+        if (FileUtils.fileExists(fileName)) FileUtils.deleteFile(fileName);
+
+        final byte[] pReadBuffer = new byte[1024];
+        
+        final int numBytesRead = FileUtils.writeInputStreamToFile(in, fileName, pReadBuffer);
+        
+        // Check that the correct number of bytes were read
+        assertEquals(randBytes.length, numBytesRead);
+
+        // Check that the correct data was read
+        final File testFile = new File(fileName);
+        testFile.deleteOnExit();
+        final FileInputStream out = new FileInputStream(fileName);
+        final byte[] outBuffer = new byte[numBytesRead];
+        out.read(outBuffer);
+        assertArrayEquals(randBytesCopy, outBuffer);        
     }
 
     @Test
