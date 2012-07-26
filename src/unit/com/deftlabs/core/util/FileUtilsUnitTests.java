@@ -130,7 +130,7 @@ public final class FileUtilsUnitTests {
         // Cleanup.
         deleteDir(scratchDir);
     }
-    
+
     @Test
     public final void writeInputStreamtoFile() throws Exception {
         // Generate 10mb of randomness
@@ -144,16 +144,16 @@ public final class FileUtilsUnitTests {
 
         // Generate an InputStream from the junk
         final InputStream in = new ByteArrayInputStream(randBytes);
-        
+
         // Call the method we want to test, use a 1mb buffer
         final String fileName = "/tmp/fileUtilsBytes.dat";
         // if file is already there, delete it
         if (FileUtils.fileExists(fileName)) FileUtils.deleteFile(fileName);
 
         final byte[] pReadBuffer = new byte[1024];
-        
+
         final int numBytesRead = FileUtils.writeInputStreamToFile(in, fileName, pReadBuffer);
-        
+
         // Check that the correct number of bytes were read
         assertEquals(randBytes.length, numBytesRead);
 
@@ -163,7 +163,24 @@ public final class FileUtilsUnitTests {
         final FileInputStream out = new FileInputStream(fileName);
         final byte[] outBuffer = new byte[numBytesRead];
         out.read(outBuffer);
-        assertArrayEquals(randBytesCopy, outBuffer);        
+        assertArrayEquals(randBytesCopy, outBuffer);
+    }
+
+    @Test public void renameFile() {
+
+        try {
+
+            if (!FileUtils.fileExists("/tmp/renameFileTest1")) FileUtils.deleteFile("/tmp/renameFileTest1");
+            if (!FileUtils.fileExists("/tmp/renameFileTest")) FileUtils.writeStrToFile("testThis", "/tmp/renameFileTest");
+
+            FileUtils.renameFile("/tmp/renameFileTest", "/tmp/renameFileTest1");
+
+            assertTrue(!FileUtils.fileExists("/tmp/renameFileTest"));
+            assertTrue(FileUtils.fileExists("/tmp/renameFileTest1"));
+        } finally {
+            FileUtils.deleteFile("/tmp/renameFileTest");
+            FileUtils.deleteFile("/tmp/renameFileTest1");
+        }
     }
 
     @Test
