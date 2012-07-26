@@ -183,6 +183,8 @@ public final class FileUtilsUnitTests {
         }
     }
 
+    @Test public void createDir() { FileUtils.createDir("/tmp/foo/bar"); }
+
     @Test
     public void testExtension1() throws Exception {
         final String file1 = "/one/two/three/test.txt";
