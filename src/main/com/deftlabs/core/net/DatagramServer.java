@@ -60,7 +60,7 @@ public class DatagramServer extends ThreadBase {
      * @param pHandler The message handler.
      * @param pBufferSize The message buffer size.
      * @param pBufferOffset The buffer offset.
-     * @param pBindAddress The bind address.
+     * @param pBindAddress The bind address. If null, it binds to all addresses.
      * @param pPort The port.
      * @throws IOException
      */
@@ -85,7 +85,7 @@ public class DatagramServer extends ThreadBase {
      * @param pFilter The message filter.
      * @param pBufferSize The message buffer size.
      * @param pBufferOffset The buffer offset.
-     * @param pBindAddress The bind address.
+     * @param pBindAddress The bind address. If null, it binds to all addresses.
      * @param pPort The port.
      * @throws IOException
      */
@@ -111,8 +111,11 @@ public class DatagramServer extends ThreadBase {
         _selector = Selector.open();
         _channel = DatagramChannel.open();
         _channel.configureBlocking(false);
+
         _channel.register(_selector, SelectionKey.OP_READ);
         _socket = _channel.socket();
+
+        _socket.setReuseAddress(true);
     }
 
     /**
@@ -122,7 +125,10 @@ public class DatagramServer extends ThreadBase {
         try {
             LOG.log(Level.FINE, "binding to: " + _bindAddress + " - port: " + _port);
 
-            _socket.bind(new InetSocketAddress(_bindAddress, _port));
+            final InetSocketAddress addr
+            = (_bindAddress == null) ? new InetSocketAddress(_port) : new InetSocketAddress(_bindAddress, _port);
+
+            _socket.bind(addr);
 
         } catch (final IOException ioe) {
             StringBuilder error = new StringBuilder("error binding to: '");
