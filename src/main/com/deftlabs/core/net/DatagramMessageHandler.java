@@ -18,8 +18,7 @@
 package com.deftlabs.core.net;
 
 /**
- * The message handler interface. Message handlers implement
- * an execute and reset method.
+ * The message handler interface. Message handlers implement the execute method.
  */
 public interface DatagramMessageHandler {
 
