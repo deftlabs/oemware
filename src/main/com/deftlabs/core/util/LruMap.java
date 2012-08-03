@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An lru linked hash map. Access to this map is thread-safe. This class also
@@ -33,6 +34,7 @@ public class LruMap<K,V> implements Map<K, V> {
     private final LinkedHashMap<K,V> _map;
     private final LruMap.EvictionHandler<K, V> _handler;
     private final int _size;
+    private final ReentrantLock _lock = new ReentrantLock();
 
     private static final float LOAD_FACTOR = 0.75f;
 
@@ -70,45 +72,102 @@ public class LruMap<K,V> implements Map<K, V> {
         };
     }
 
-    public final synchronized void clear() { _map.clear(); }
-    public final synchronized int size() { return _map.size(); }
-    public final synchronized Collection<V> values() { return _map.values(); }
-    public final synchronized int hashCode() { return _map.hashCode(); }
-
-    public final synchronized V get (final Object pKey) {
-        return _map.get(pKey);
+    @Override public void clear() {
+        try {
+            _lock.lock();
+            _map.clear();
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized boolean containsKey(final Object pKey) {
-        return _map.containsKey(pKey);
+    @Override public int size() {
+        try {
+            _lock.lock();
+            return _map.size();
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized boolean containsValue(final Object pValue) {
-        return _map.containsValue(pValue);
+    @Override public Collection<V> values() {
+        try {
+            _lock.lock();
+            return _map.values();
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized Set<Map.Entry<K,V>> entrySet() {
-        return _map.entrySet();
+    @Override public int hashCode() {
+        try {
+            _lock.lock();
+            return _map.hashCode();
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized boolean isEmpty() { return _map.isEmpty(); }
-
-    public final synchronized Set<K> keySet() { return _map.keySet(); }
-
-    public final synchronized V put (K pKey, V pValue) {
-        return _map.put(pKey, pValue);
+    @Override public V get (final Object pKey) {
+        try {
+            _lock.lock();
+            return _map.get(pKey);
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized V remove(final Object pKey) {
-        return _map.remove(pKey);
+    @Override public boolean containsKey(final Object pKey) {
+        try {
+            _lock.lock();
+            return _map.containsKey(pKey);
+        } finally { _lock.unlock(); }
     }
 
-    public final synchronized void putAll(Map   <? extends K,
-                                                ? extends V> pValues)
-    { _map.putAll(pValues); }
+    @Override public boolean containsValue(final Object pValue) {
+        try {
+            _lock.lock();
+            return _map.containsValue(pValue);
+        } finally { _lock.unlock(); }
+    }
 
-    public final synchronized boolean equals(final Object pValue) {
-         return _map.equals(pValue);
+    @Override public Set<Map.Entry<K,V>> entrySet() {
+        try {
+            _lock.lock();
+            return _map.entrySet();
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public boolean isEmpty() {
+        try {
+            _lock.lock();
+            return _map.isEmpty();
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public Set<K> keySet() {
+        try {
+            _lock.lock();
+            return _map.keySet();
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public V put (K pKey, V pValue) {
+        try {
+            _lock.lock();
+            return _map.put(pKey, pValue);
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public V remove(final Object pKey) {
+        try {
+            _lock.lock();
+            return _map.remove(pKey);
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public void putAll(Map <? extends K, ? extends V> pValues) {
+        try {
+            _lock.lock();
+            _map.putAll(pValues);
+        } finally { _lock.unlock(); }
+    }
+
+    @Override public boolean equals(final Object pValue) {
+        try {
+            _lock.lock();
+            return _map.equals(pValue);
+        } finally { _lock.unlock(); }
     }
 
     /**
