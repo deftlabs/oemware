@@ -890,7 +890,7 @@ public final class FileUtils {
                                         + pTo);
             }
 
-            try { Thread.currentThread().sleep(pRetrySleep);
+            try { Thread.sleep(pRetrySleep);
             } catch (InterruptedException ie) { }
 
             if (!pFrom.renameTo(pTo)) {
