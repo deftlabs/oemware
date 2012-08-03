@@ -34,7 +34,7 @@ public class LruMap<K,V> implements Map<K, V> {
     private final LinkedHashMap<K,V> _map;
     private final LruMap.EvictionHandler<K, V> _handler;
     private final int _size;
-    private final ReentrantLock _lock = new ReentrantLock();
+    private final ReentrantLock _lock = new ReentrantLock(true);
 
     private static final float LOAD_FACTOR = 0.75f;
 
