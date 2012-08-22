@@ -10,7 +10,7 @@ OEMware is a set of open source Java utilities
 Usage
 ------------
 
-* [Javadocs](http://api.deftlabs.com/oemware)
+* [Javadocs](http://api.deftlabs.com/oemware/current)
 
 
 Build
